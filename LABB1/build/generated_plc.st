@@ -1,10 +1,32 @@
 PROGRAM Main
   VAR
     Button AT %IX0.0 : BOOL;
-    LED AT %QX0.0 : BOOL;
+  END_VAR
+  VAR
+    Statelight : BOOL := TRUE;
+  END_VAR
+  VAR
+    LEDG AT %QX0.0 : BOOL;
+    LEDB AT %QX0.1 : BOOL;
+    LEDR AT %QX0.2 : BOOL;
+    LEDGu AT %QX0.3 : BOOL;
+  END_VAR
+  VAR
+    TON0 : TON;
+    OnTime : TIME := T#2s;
+    TON1 : TON;
   END_VAR
 
-  LED := Button;
+  LEDB := Statelight;
+  LEDR := NOT(Statelight);
+  TON0(IN := Statelight, PT := OnTime);
+  IF TON0.Q THEN
+    Statelight := FALSE; (*reset*)
+  END_IF;
+  TON1(IN := NOT(Statelight), PT := OnTime);
+  IF TON1.Q THEN
+    Statelight := TRUE; (*set*)
+  END_IF;
 END_PROGRAM
 
 
