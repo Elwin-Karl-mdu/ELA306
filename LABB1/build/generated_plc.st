@@ -1,0 +1,17 @@
+PROGRAM Main
+  VAR
+    Button AT %IX0.0 : BOOL;
+    LED AT %QX0.0 : BOOL;
+  END_VAR
+
+  LED := Button;
+END_PROGRAM
+
+
+CONFIGURATION Config0
+
+  RESOURCE Res0 ON PLC
+    TASK MainTask(INTERVAL := T#20ms,PRIORITY := 0);
+    PROGRAM MainInstance WITH MainTask : Main;
+  END_RESOURCE
+END_CONFIGURATION

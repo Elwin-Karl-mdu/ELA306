@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<project xmlns="http://www.plcopen.org/xml/tc6_0201" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ns1="http://www.plcopen.org/xml/tc6.xsd">
+<project xmlns="http://www.plcopen.org/xml/tc6_0201" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ns1="http://www.plcopen.org/xml/tc6_0201">
   <fileHeader companyName="Unknown" productName="Unnamed" productVersion="1" creationDateTime="2026-11-17T11:02:30"/>
-  <contentHeader name="Unnamed" modificationDateTime="2026-11-17T11:02:30">
+  <contentHeader name="Unnamed" modificationDateTime="2026-11-17T13:12:13">
     <coordinateInfo>
       <fbd>
         <scaling x="10" y="10"/>
@@ -16,12 +16,126 @@
   </contentHeader>
   <types>
     <dataTypes/>
-    <pous/>
+    <pous>
+      <pou name="Main" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Button" address="%IX0.0">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="LEDG" address="%QX0.0">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="LEDB" address="%QX0.1">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="LEDR" address="%QX0.2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="LEDGu" address="%QX0.3">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </localVars>
+          <localVars>
+            <variable name="TON0">
+              <type>
+                <derived name="TON"/>
+              </type>
+            </variable>
+            <variable name="OnTime">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#10s"/>
+              </initialValue>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <LD>
+            <coil localId="6" negated="false" width="21" height="20">
+              <position x="380" y="220"/>
+              <connectionPointIn>
+                <relPosition x="0" y="10"/>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="10"/>
+              </connectionPointOut>
+              <variable>LEDB</variable>
+            </coil>
+            <coil localId="7" negated="false" width="21" height="20">
+              <position x="380" y="290"/>
+              <connectionPointIn>
+                <relPosition x="0" y="10"/>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="21" y="10"/>
+              </connectionPointOut>
+              <variable>LEDR</variable>
+            </coil>
+            <block localId="8" typeName="TON" instanceName="TON0" width="50" height="60">
+              <position x="150" y="220"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="30"/>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="9">
+                      <position x="150" y="270"/>
+                      <position x="70" y="270"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="50" y="30"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="50" y="50"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="9" width="60" height="30" negated="false">
+              <position x="10" y="250"/>
+              <connectionPointOut>
+                <relPosition x="60" y="20"/>
+              </connectionPointOut>
+              <expression>OnTime</expression>
+            </inVariable>
+          </LD>
+        </body>
+      </pou>
+    </pous>
   </types>
   <instances>
     <configurations>
       <configuration name="Config0">
-        <resource name="Res0"/>
+        <resource name="Res0">
+          <task name="MainTask" priority="0" interval="T#20ms">
+            <pouInstance name="MainInstance" typeName="Main"/>
+          </task>
+        </resource>
       </configuration>
     </configurations>
   </instances>
