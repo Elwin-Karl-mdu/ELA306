@@ -36,20 +36,59 @@ PROGRAM Main
   END_VAR
   VAR
     TON0 : TON;
-    OnTime : TIME := T#2s;
+    OnTime : TIME := T#10s;
+    OldState : BOOL;
+    ButtonTimerState : BOOL := FALSE;
     TON1 : TON;
+    ButtonTimer : TIME := T#80s;
+    ButtonState : BOOL := FALSE;
+    ButtonLightState : BOOL := FALSE;
+    TON2 : TON;
+    TON3 : TON;
   END_VAR
 
-  LEDB := Statelight;
-  LEDR := NOT(Statelight);
-  TON0(IN := Statelight, PT := OnTime);
+  LEDB := Statelight AND NOT(ButtonLightState);
+  LEDR := NOT(Statelight) AND NOT(ButtonLightState);
+  TON0(IN := Statelight AND NOT(ButtonLightState), PT := OnTime);
   IF TON0.Q THEN
     Statelight := FALSE; (*reset*)
   END_IF;
-  TON1(IN := NOT(Statelight), PT := OnTime);
+  TON1(IN := NOT(Statelight) AND NOT(ButtonLightState), PT := OnTime);
   IF TON1.Q THEN
     Statelight := TRUE; (*set*)
   END_IF;
+  IF Button AND NOT(ButtonTimerState) THEN
+    ButtonState := TRUE; (*set*)
+  END_IF;
+  LEDG := ButtonLightState;
+  TON2(IN := LEDG, PT := OnTime);
+  IF TON2.Q THEN
+    ButtonState := FALSE; (*reset*)
+  END_IF;
+  IF TON2.Q THEN
+    ButtonLightState := FALSE; (*reset*)
+  END_IF;
+  IF ButtonState AND TON0.Q THEN
+    ButtonLightState := TRUE; (*set*)
+  END_IF;
+  IF ButtonState AND TON1.Q THEN
+    ButtonLightState := TRUE; (*set*)
+  END_IF;
+  IF NOT(OldState) AND Statelight AND TON2.Q THEN
+    Statelight := TRUE; (*set*)
+  END_IF;
+  IF OldState AND Statelight AND TON2.Q THEN
+    Statelight := FALSE; (*reset*)
+  END_IF;
+  OldState := Statelight AND TON2.Q;
+  TON3(IN := ButtonTimerState, PT := ButtonTimer);
+  IF TON3.Q THEN
+    ButtonTimerState := FALSE; (*reset*)
+  END_IF;
+  IF TON2.Q THEN
+    ButtonTimerState := TRUE; (*set*)
+  END_IF;
+  LEDGu := ButtonTimerState;
 END_PROGRAM
 
 

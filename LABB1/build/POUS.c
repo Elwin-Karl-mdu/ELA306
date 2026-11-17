@@ -54,28 +54,71 @@ void MAIN_init__(MAIN *data__, BOOL retain) {
   __INIT_LOCATED(BOOL,__QX0_3,data__->LEDGU,retain)
   __INIT_LOCATED_VALUE(data__->LEDGU,__BOOL_LITERAL(FALSE))
   TON_init__(&data__->TON0,retain);
-  __INIT_VAR(data__->ONTIME,__time_to_timespec(1, 0, 2, 0, 0, 0),retain)
+  __INIT_VAR(data__->ONTIME,__time_to_timespec(1, 0, 10, 0, 0, 0),retain)
+  __INIT_VAR(data__->OLDSTATE,__BOOL_LITERAL(FALSE),retain)
+  __INIT_VAR(data__->BUTTONTIMERSTATE,__BOOL_LITERAL(FALSE),retain)
   TON_init__(&data__->TON1,retain);
+  __INIT_VAR(data__->BUTTONTIMER,__time_to_timespec(1, 0, 80, 0, 0, 0),retain)
+  __INIT_VAR(data__->BUTTONSTATE,__BOOL_LITERAL(FALSE),retain)
+  __INIT_VAR(data__->BUTTONLIGHTSTATE,__BOOL_LITERAL(FALSE),retain)
+  TON_init__(&data__->TON2,retain);
+  TON_init__(&data__->TON3,retain);
 }
 
 // Code part
 void MAIN_body__(MAIN *data__) {
   // Initialise TEMP variables
 
-  __SET_LOCATED(data__->,LEDB,,__GET_VAR(data__->STATELIGHT,));
-  __SET_LOCATED(data__->,LEDR,,!(__GET_VAR(data__->STATELIGHT,)));
-  __SET_VAR(data__->TON0.,IN,,__GET_VAR(data__->STATELIGHT,));
+  __SET_LOCATED(data__->,LEDB,,(__GET_VAR(data__->STATELIGHT,) && !(__GET_VAR(data__->BUTTONLIGHTSTATE,))));
+  __SET_LOCATED(data__->,LEDR,,(!(__GET_VAR(data__->STATELIGHT,)) && !(__GET_VAR(data__->BUTTONLIGHTSTATE,))));
+  __SET_VAR(data__->TON0.,IN,,(__GET_VAR(data__->STATELIGHT,) && !(__GET_VAR(data__->BUTTONLIGHTSTATE,))));
   __SET_VAR(data__->TON0.,PT,,__GET_VAR(data__->ONTIME,));
   TON_body__(&data__->TON0);
   if (__GET_VAR(data__->TON0.Q,)) {
     __SET_VAR(data__->,STATELIGHT,,__BOOL_LITERAL(FALSE));
   };
-  __SET_VAR(data__->TON1.,IN,,!(__GET_VAR(data__->STATELIGHT,)));
+  __SET_VAR(data__->TON1.,IN,,(!(__GET_VAR(data__->STATELIGHT,)) && !(__GET_VAR(data__->BUTTONLIGHTSTATE,))));
   __SET_VAR(data__->TON1.,PT,,__GET_VAR(data__->ONTIME,));
   TON_body__(&data__->TON1);
   if (__GET_VAR(data__->TON1.Q,)) {
     __SET_VAR(data__->,STATELIGHT,,__BOOL_LITERAL(TRUE));
   };
+  if ((__GET_LOCATED(data__->BUTTON,) && !(__GET_VAR(data__->BUTTONTIMERSTATE,)))) {
+    __SET_VAR(data__->,BUTTONSTATE,,__BOOL_LITERAL(TRUE));
+  };
+  __SET_LOCATED(data__->,LEDG,,__GET_VAR(data__->BUTTONLIGHTSTATE,));
+  __SET_VAR(data__->TON2.,IN,,__GET_LOCATED(data__->LEDG,));
+  __SET_VAR(data__->TON2.,PT,,__GET_VAR(data__->ONTIME,));
+  TON_body__(&data__->TON2);
+  if (__GET_VAR(data__->TON2.Q,)) {
+    __SET_VAR(data__->,BUTTONSTATE,,__BOOL_LITERAL(FALSE));
+  };
+  if (__GET_VAR(data__->TON2.Q,)) {
+    __SET_VAR(data__->,BUTTONLIGHTSTATE,,__BOOL_LITERAL(FALSE));
+  };
+  if ((__GET_VAR(data__->BUTTONSTATE,) && __GET_VAR(data__->TON0.Q,))) {
+    __SET_VAR(data__->,BUTTONLIGHTSTATE,,__BOOL_LITERAL(TRUE));
+  };
+  if ((__GET_VAR(data__->BUTTONSTATE,) && __GET_VAR(data__->TON1.Q,))) {
+    __SET_VAR(data__->,BUTTONLIGHTSTATE,,__BOOL_LITERAL(TRUE));
+  };
+  if (((!(__GET_VAR(data__->OLDSTATE,)) && __GET_VAR(data__->STATELIGHT,)) && __GET_VAR(data__->TON2.Q,))) {
+    __SET_VAR(data__->,STATELIGHT,,__BOOL_LITERAL(TRUE));
+  };
+  if (((__GET_VAR(data__->OLDSTATE,) && __GET_VAR(data__->STATELIGHT,)) && __GET_VAR(data__->TON2.Q,))) {
+    __SET_VAR(data__->,STATELIGHT,,__BOOL_LITERAL(FALSE));
+  };
+  __SET_VAR(data__->,OLDSTATE,,(__GET_VAR(data__->STATELIGHT,) && __GET_VAR(data__->TON2.Q,)));
+  __SET_VAR(data__->TON3.,IN,,__GET_VAR(data__->BUTTONTIMERSTATE,));
+  __SET_VAR(data__->TON3.,PT,,__GET_VAR(data__->BUTTONTIMER,));
+  TON_body__(&data__->TON3);
+  if (__GET_VAR(data__->TON3.Q,)) {
+    __SET_VAR(data__->,BUTTONTIMERSTATE,,__BOOL_LITERAL(FALSE));
+  };
+  if (__GET_VAR(data__->TON2.Q,)) {
+    __SET_VAR(data__->,BUTTONTIMERSTATE,,__BOOL_LITERAL(TRUE));
+  };
+  __SET_LOCATED(data__->,LEDGU,,__GET_VAR(data__->BUTTONTIMERSTATE,));
 
   goto __end;
 
